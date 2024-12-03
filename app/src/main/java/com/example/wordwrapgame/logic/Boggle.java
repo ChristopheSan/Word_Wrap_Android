@@ -117,6 +117,10 @@ public class Boggle {
         return BOARD_SIZE;
     }
 
+    public String returnValueAtBoardPos(int r, int c) {
+        return board[r][c];
+    }
+
     // private methods
     private void configureBoardWithDie(){
         // With the diceSet use the showingside to configure a board
