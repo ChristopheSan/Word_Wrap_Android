@@ -1,5 +1,6 @@
 package com.example.wordwrapgame;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -46,11 +47,19 @@ public class GameboardFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        String[][] testboard = {
+                {"a", "B", "C", "D"},
+                {"d", "e", "G", "H"},
+                {"u", "J", "K", "L"},
+                {"l", "N", "O", "P"}
+        };
+
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             Log.d("GameboardFragment", "onCreate: arguments not null");
         }
         boggle = new Boggle(requireContext());
+        //boggle.setBoard(testboard);
         boggle.solveBoard();
 
         solvedWords = boggle.getWordsFound();
@@ -58,6 +67,7 @@ public class GameboardFragment extends Fragment {
 //            Log.d("GameboardFragment", "onCreate: " + word);
 //        }
 
+        wordList = new ArrayList<>();
         selectedPath = new ArrayList<>();
     }
 
@@ -72,8 +82,9 @@ public class GameboardFragment extends Fragment {
         gameboardLayout = view.findViewById(R.id.board_grid);
         initGameboard();
 
-        // Grid TouchListener
+        // Grid TouchListener3
         gameboardLayout.setOnTouchListener(new View.OnTouchListener() {
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
@@ -90,6 +101,7 @@ public class GameboardFragment extends Fragment {
                 }
                 return false;
             }
+
         });
 
         return view;
@@ -108,14 +120,26 @@ public class GameboardFragment extends Fragment {
 
     private void handleActionUp() {
         // Check the word formed and reset highlights
-//        String word = getWordFromPath();
-//        if (solvedWords.contains(word)) {
-//            Log.d("GameboardFragment", "Valid Word: " + word);
-//        } else {
-//            Log.d("GameboardFragment", "Invalid Word: " + word);
-//        }
+        String word = getWordFromPath();
+        if (solvedWords.contains(word) && !wordList.contains(word)) {
+            Log.d("GameboardFragment", "Added Word: " + word);
+            wordList.add(word);
+        } else {
+            Log.d("GameboardFragment", "Invalid Word: " + word);
+        }
         resetHighlights();
         selectedPath.clear();
+    }
+
+    private String getWordFromPath() {
+        StringBuilder word = new StringBuilder();
+        // search through path and get the word
+        for (Pair<Integer, Integer> position : selectedPath) {
+            int row = position.first;
+            int col = position.second;
+            word.append(boggle.returnValueAtBoardPos(row, col));
+        }
+        return word.toString();
     }
 
     private void resetHighlights() {
@@ -135,10 +159,17 @@ public class GameboardFragment extends Fragment {
 
             // Check if the touch event is inside the CardView
             if (rect.contains((int) motionEvent.getRawX(), (int) motionEvent.getRawY())) {
-                Log.d("GameboardFragment", "highlightCell: " + i);
+//                Log.d("GameboardFragment", "highlightCell: " + i  + "\n" +
+//                        "rect width: " + rect.width() + "\n" +
+//                        "rect height: " + rect.height());
                 int row = i / boggle.getBoardSize();
                 int col = i % boggle.getBoardSize();
 
+                // check if the new pair is adjacent to the last pair in the path
+                if (!selectedPath.isEmpty()) {
+                    if (!isAdjacentToLastPair(row, col))
+                        break;
+                }
                 Pair<Integer, Integer> position = new Pair<>(row, col);
 
                 if (!selectedPath.contains(position)) {
@@ -151,6 +182,17 @@ public class GameboardFragment extends Fragment {
         }
     }
 
+    private boolean isAdjacentToLastPair(int row, int col) {
+        Pair<Integer, Integer> lastPair = selectedPath.get(selectedPath.size() - 1);
+        int lastRow = lastPair.first;
+        int lastCol = lastPair.second;
+
+        int deltaRow = Math.abs(row - lastRow);
+        int deltaCol = Math.abs(col - lastCol);
+
+        return (deltaRow <= 1 && deltaCol <= 1);
+    }
+
 
     private void initGameboard() {
         int boardSize = boggle.getBoardSize();
@@ -160,13 +202,13 @@ public class GameboardFragment extends Fragment {
             for (int j = 0; j < boardSize; j++)  {
                 CardView cardView = new CardView(requireContext());
                 cardView.setCardElevation(8);
-                cardView.setRadius(16);
+                cardView.setRadius(24);
                 cardView.setLayoutParams(getCardLayoutParams(i, j));
 
                 TextView textView = new TextView(requireContext());
                 textView.setText(diceBoard[i][j].getShowingSide().toUpperCase().charAt(0) + "");
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 64);
-                textView.setPadding(16, 10, 16, 10);
+                textView.setPadding(18, 18, 18, 18);
                 textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 textView.setBackgroundColor(Color.rgb(254, 169, 169));
                 textView.setTextColor(Color.WHITE);
