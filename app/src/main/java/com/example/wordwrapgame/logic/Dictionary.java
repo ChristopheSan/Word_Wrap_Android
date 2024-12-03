@@ -3,6 +3,7 @@ package com.example.wordwrapgame.logic;
 import android.util.Log;
 
 import java.io.*;
+import java.util.ArrayList;
 
 public class Dictionary {
 
@@ -16,22 +17,29 @@ public class Dictionary {
     private Node root;
     int numWords;
 
+    ArrayList<String> words;
+
     public Dictionary() {
         root = new Node();
         numWords = 0;
+        words = new ArrayList<>();
     }
 
     // constructor with a file name
     public Dictionary(String fileName)  {
         root = new Node();
         numWords = 0;
+        words = new ArrayList<>();
         loadDictionaryFile(fileName);
+
     }
 
     public Dictionary(InputStream inputStream)   {
         root = new Node();
         numWords = 0;
+        words = new ArrayList<>();
         loadDictionaryResource(inputStream);
+
     }
 
 
@@ -138,6 +146,25 @@ public class Dictionary {
         printHelper(root, "");
     }
 
+    public ArrayList<String> getWords() {
+        getWordsHelper(root, "");
+        return words;
+    }
+
+    //Private methods
+
+    private void getWordsHelper(Node curr, String prefix) {
+        if (curr == null)
+            return;
+        if (curr.isWord)
+            words.add(prefix);
+        for (int i = 0; i < NUM_CHARS; i++) {
+            if (curr.children[i] != null) {
+                getWordsHelper(curr.children[i], prefix + (char) ('a' + i));
+            }
+        }
+    }
+
     private void printHelper(Node curr, String prefix) {
         if (curr == null)
             return;
@@ -149,6 +176,5 @@ public class Dictionary {
             }
         }
     }
-
 
 } // end class

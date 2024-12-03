@@ -106,6 +106,10 @@ public class Boggle {
         return diceBoard;
     }
 
+    public ArrayList<String> getWordsFound() {
+        return wordsFound.getWords();
+    }
+
     public void printSolvedWords() {
         wordsFound.printWords();
     }
