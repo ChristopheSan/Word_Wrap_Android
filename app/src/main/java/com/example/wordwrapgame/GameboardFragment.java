@@ -1,8 +1,12 @@
 package com.example.wordwrapgame;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.cardview.widget.CardView;
@@ -15,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,11 +30,9 @@ import com.example.wordwrapgame.logic.Die;
 import java.util.ArrayList;
 
 public class GameboardFragment extends Fragment {
-    GameboardFragment gameboardFragment;
-    WordlistFragment wordlistFragment;
-
     Boggle boggle;
     GridLayout gameboardLayout;
+    FrameLayout overlay;
 
     ArrayList<String> solvedWords;
     ArrayList<String> wordList;
@@ -77,10 +80,15 @@ public class GameboardFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_gameboard, container, false);
 
         // Initialize UI components
+        // Animation Overlay
+        overlay = view.findViewById(R.id.overlay);
 
         // Gameboard
         gameboardLayout = view.findViewById(R.id.board_grid);
         initGameboard();
+
+        overlay.requestLayout();
+        overlay.invalidate();
 
         // Grid TouchListener3
         gameboardLayout.setOnTouchListener(new View.OnTouchListener() {
@@ -101,7 +109,6 @@ public class GameboardFragment extends Fragment {
                 }
                 return false;
             }
-
         });
 
         return view;
@@ -123,6 +130,7 @@ public class GameboardFragment extends Fragment {
         String word = getWordFromPath();
         if (solvedWords.contains(word) && !wordList.contains(word)) {
             Log.d("GameboardFragment", "Added Word: " + word);
+            animateSuccessfulWord(selectedPath);
             wordList.add(word);
         } else {
             Log.d("GameboardFragment", "Invalid Word: " + word);
@@ -130,6 +138,7 @@ public class GameboardFragment extends Fragment {
         resetHighlights();
         selectedPath.clear();
     }
+
 
     private String getWordFromPath() {
         StringBuilder word = new StringBuilder();
@@ -212,7 +221,6 @@ public class GameboardFragment extends Fragment {
                 textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 textView.setBackgroundColor(Color.rgb(254, 169, 169));
                 textView.setTextColor(Color.WHITE);
-                //textView.setElevation(12);
 
                 cardView.addView(textView);
 
@@ -220,6 +228,7 @@ public class GameboardFragment extends Fragment {
                 gameboardLayout.addView(cardView);
             }
         }
+
     }
 
     private GridLayout.LayoutParams getCardLayoutParams(int row, int col) {
@@ -230,9 +239,79 @@ public class GameboardFragment extends Fragment {
         return params;
     }
 
-    private int getDrawableForLetter(char letter) {
-        String resourceName = String.valueOf(letter).toLowerCase(); // Ensure lowercase
-        return getResources().getIdentifier(resourceName, "drawable", getActivity().getPackageName());
+    private void animateSuccessfulWord(ArrayList<Pair<Integer, Integer>> wordPath) {
+        for (Pair<Integer, Integer> position : wordPath) {
+            int index = position.first * boggle.getBoardSize() + position.second;
+            CardView originalTile = (CardView) gameboardLayout.getChildAt(index);
+            animateTile(originalTile);
+        }
     }
 
+    private void animateTile(CardView originalTile) {
+        overlay = getView().findViewById(R.id.overlay);
+
+        // Dupe card
+        CardView duplicateTile = new CardView(requireContext());
+        duplicateTile.setLayoutParams(originalTile.getLayoutParams());
+        //duplicateTile.setCardBackgroundColor(((ColorDrawable) originalTile.getBackground()).getColor());
+        duplicateTile.setCardElevation(originalTile.getCardElevation());
+        duplicateTile.setRadius(originalTile.getRadius());
+
+        // Dupe textview
+        TextView originalTextView = (TextView) originalTile.getChildAt(0);
+        TextView duplicateTextView = new TextView(requireContext());
+        duplicateTextView.setText(originalTextView.getText());
+        duplicateTextView.setTextSize(originalTextView.getTextSize());
+        duplicateTextView.setTextAlignment(originalTextView.getTextAlignment());
+        duplicateTextView.setTextColor(originalTextView.getTextColors());
+        duplicateTextView.setBackgroundColor(Color.rgb(255, 110, 97));
+
+        duplicateTile.addView(duplicateTextView);
+
+        // Add to invisible layer
+        overlay.addView(duplicateTile);
+        overlay.requestLayout();
+        overlay.invalidate();
+
+        // Get the original tiles position on screen
+        int[] originalPosition = new int[2];
+        originalTile.getLocationOnScreen(originalPosition);
+
+        // Set the duplicate's initial position to match the original
+        duplicateTile.setX(originalPosition[0]);
+        duplicateTile.setY(originalPosition[1]);
+
+        // tile shrink animation
+        float targetX = originalPosition[0] + (float) (Math.random() * 200 - 100); // Random horizontal movement
+        float targetY = originalPosition[1] + 800; // Fly towards the bottom of the screen
+        ObjectAnimator translateX = ObjectAnimator.ofFloat(duplicateTile, "translationX", duplicateTile.getX(), targetX);
+        ObjectAnimator translateY = ObjectAnimator.ofFloat(duplicateTile, "translationY", duplicateTile.getY(), targetY);
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(duplicateTile, "scaleX", .5f, 0.1f); // Shrink the tile
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(duplicateTile, "scaleY", .5f, 0.1f);
+
+        // Combine animations
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(translateX, translateY, scaleX, scaleY);
+        animatorSet.setDuration(1500);
+
+        // need to remove the duplicate
+        animatorSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {}
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                overlay.removeView(duplicateTile); // Remove duplicate tile
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {}
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {}
+        });
+
+        // Start the animation
+        animatorSet.start();
+    }
 }
