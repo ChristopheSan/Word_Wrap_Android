@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
@@ -38,6 +39,13 @@ public class GameboardFragment extends Fragment {
     ArrayList<String> wordList;
 
     ArrayList<Pair<Integer, Integer>> selectedPath;
+
+    int currentWordsFound;
+    double currentScore;
+
+    TextView scoreValue;
+    TextView wordCountValue;
+
 
     public GameboardFragment() {
         // Required empty public constructor
@@ -83,14 +91,24 @@ public class GameboardFragment extends Fragment {
         // Animation Overlay
         overlay = view.findViewById(R.id.overlay);
 
-        // Gameboard
+        // Score Components
+        scoreValue = view.findViewById(R.id.score_value);
+        wordCountValue = view.findViewById(R.id.word_count_value);
+        currentWordsFound = 0;
+        currentScore = 0;
+        updateCardAmounts();
+
+
+        // Game board
         gameboardLayout = view.findViewById(R.id.board_grid);
         initGameboard();
 
+
+        // Overlay
         overlay.requestLayout();
         overlay.invalidate();
 
-        // Grid TouchListener3
+        // Grid TouchListener
         gameboardLayout.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
@@ -132,6 +150,7 @@ public class GameboardFragment extends Fragment {
             Log.d("GameboardFragment", "Added Word: " + word);
             animateSuccessfulWord(selectedPath);
             wordList.add(word);
+            updateWidgets(word.length());
         } else {
             Log.d("GameboardFragment", "Invalid Word: " + word);
         }
@@ -139,6 +158,32 @@ public class GameboardFragment extends Fragment {
         selectedPath.clear();
     }
 
+
+    private void updateWidgets(int wordLength) {
+        // words found
+        currentWordsFound++;
+
+        // game score
+        if (wordLength <= 2) {
+            currentScore += .5;
+        } else if (wordLength == 3 || wordLength == 4) {
+            currentScore += 1;
+        } else if (wordLength == 5) {
+            currentScore += 2;
+        } else if (wordLength == 6) {
+            currentScore += 3;
+        } else if (wordLength == 7) {
+            currentScore += 5;
+        } else {
+            currentScore += 11;
+        }
+        updateCardAmounts();
+    }
+
+    private void updateCardAmounts() {
+        scoreValue.setText(String.valueOf(currentScore) + "");
+        wordCountValue.setText(String.valueOf(currentWordsFound) + "/" + solvedWords.size());
+    }
 
     private String getWordFromPath() {
         StringBuilder word = new StringBuilder();
@@ -228,7 +273,20 @@ public class GameboardFragment extends Fragment {
                 gameboardLayout.addView(cardView);
             }
         }
+        gameboardLayout.requestLayout();
+        gameboardLayout.invalidate();
 
+    }
+
+    private void resetGame() {
+
+        // Add score to the score total
+
+        // Get score item
+
+
+
+        // reset all attributes to default and spawn a new game
     }
 
     private GridLayout.LayoutParams getCardLayoutParams(int row, int col) {

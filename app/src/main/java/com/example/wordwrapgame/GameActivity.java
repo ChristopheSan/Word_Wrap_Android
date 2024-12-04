@@ -20,7 +20,6 @@ public class GameActivity extends AppCompatActivity {
     private FrameLayout gameboardFragmentContainer;
     private LinearLayoutCompat mainLayout;
 
-    private GridView gameboard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
