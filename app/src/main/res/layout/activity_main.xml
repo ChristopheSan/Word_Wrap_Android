@@ -26,36 +26,30 @@
             android:layout_height="match_parent"
             android:background="#98b7fe">
 
-            <TextView
-                android:id="@+id/appTitle1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:rotation="-25"
-                android:rotationY="-22"
-                android:text="Word"
-                android:textColor="#ff6e61"
-                android:textSize="42sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.348"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.225" />
+<!--            <TextView-->
+<!--                android:id="@+id/appTitle1"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:rotation="-25"-->
+<!--                android:rotationY="-22"-->
+<!--                android:text="Word"-->
+<!--                android:textColor="#ff6e61"-->
+<!--                android:textSize="42sp"-->
+<!--                android:textStyle="bold" />-->
 
-            <TextView
-                android:id="@+id/appTitle2"
-                android:layout_width="99dp"
-                android:layout_height="58dp"
-                android:layout_marginTop="8dp"
-                android:rotation="25"
-                android:rotationY="22"
-                android:text="Wrap"
-                android:textColor="#fea9a9"
-                android:textSize="42sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@id/appTitle1"
-                app:layout_constraintTop_toBottomOf="@id/appTitle1" />
+<!--            <TextView-->
+<!--                android:id="@+id/appTitle2"-->
+<!--                android:layout_width="99dp"-->
+<!--                android:layout_height="58dp"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                android:rotation="25"-->
+<!--                android:rotationY="22"-->
+<!--                android:text="Wrap"-->
+<!--                android:textColor="#fea9a9"-->
+<!--                android:textSize="42sp"-->
+<!--                android:textStyle="bold"-->
+<!--                app:layout_constraintStart_toEndOf="@id/appTitle1"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/appTitle1" />-->
 
             <Button
                 android:id="@+id/startGameButton"
@@ -81,6 +75,18 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/startGameButton" />
+
+            <ImageView
+                android:id="@+id/appTitle2"
+                android:layout_width="84dp"
+                android:layout_height="82dp"
+                android:src="@mipmap/ic_wordwrap"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.226" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
