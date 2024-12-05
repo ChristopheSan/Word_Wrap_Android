@@ -4,6 +4,8 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +21,8 @@ public class StatsActivity extends AppCompatActivity {
     private TextView totalWords;
     private TextView averageWordsPerGame;
 
+    private ImageView backArrow;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,15 @@ public class StatsActivity extends AppCompatActivity {
         totalWords = findViewById(R.id.total_words_value);
         averageWordsPerGame = findViewById(R.id.average_words_per_game_value);
 
+        backArrow = findViewById(R.id.return_to_menu_button);
+
+        backArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
         populateStats();
 
         // Create the gradient
@@ -42,6 +55,8 @@ public class StatsActivity extends AppCompatActivity {
         );
 
         mainLayout.setBackground(gradientDrawable);
+
+        // Give the arrow image view a click listener to return.
     }
 
     private void populateStats() {

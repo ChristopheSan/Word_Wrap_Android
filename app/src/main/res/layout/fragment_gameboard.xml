@@ -174,10 +174,10 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
     <ImageView
         android:id="@+id/return_to_menu_button"
-        android:layout_width="94dp"
-        android:layout_height="50dp"
+        android:layout_width="150px"
+        android:layout_height="150px"
         android:clickable="true"
-        app:srcCompat="@drawable/backicon_foreground" />
+        app:srcCompat="@drawable/arrow_left" />
 
     <FrameLayout
         android:id="@+id/overlay"
