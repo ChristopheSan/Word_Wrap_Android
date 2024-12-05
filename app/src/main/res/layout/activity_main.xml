@@ -5,58 +5,84 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:background="@color/white">
+    android:background="@color/white"
+    tools:context=".MainActivity">
 
-    <!-- Application Title -->
-
-    <TextView
-        android:id="@+id/appTitle1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="176dp"
-        android:text="Word"
-        android:textColor="@color/black"
-        android:textSize="36sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.374"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/appTitle2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Wrap"
-        android:textSize="36sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        app:layout_constraintTop_toBottomOf="@+id/appTitle1"
-        app:layout_constraintStart_toEndOf="@id/appTitle1"
-        app:layout_constraintVertical_bias="0.3"
-        android:layout_marginBottom="16dp" />
-
-    <!-- Start Game Button -->
-    <Button
-        android:id="@+id/startGameButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start Game"
-        app:layout_constraintTop_toBottomOf="@+id/appTitle2"
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="26dp"
+        android:padding="10dp"
+        app:cardCornerRadius="6dp"
+        android:elevation="10dp"
+        android:background="#98b7fe"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        >
 
-    <!-- Game Stats Button -->
-    <Button
-        android:id="@+id/gameStatsButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Game Stats"
-        app:layout_constraintTop_toBottomOf="@+id/startGameButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#98b7fe">
+
+            <TextView
+                android:id="@+id/appTitle1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:rotation="-25"
+                android:rotationY="-22"
+                android:text="Word"
+                android:textColor="#ff6e61"
+                android:textSize="42sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.348"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.225" />
+
+            <TextView
+                android:id="@+id/appTitle2"
+                android:layout_width="99dp"
+                android:layout_height="58dp"
+                android:layout_marginTop="8dp"
+                android:rotation="25"
+                android:rotationY="22"
+                android:text="Wrap"
+                android:textColor="#fea9a9"
+                android:textSize="42sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@id/appTitle1"
+                app:layout_constraintTop_toBottomOf="@id/appTitle1" />
+
+            <Button
+                android:id="@+id/startGameButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#48d105"
+                android:text="Start Game"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/appTitle2" />
+
+            <!-- Game Stats Button -->
+            <Button
+                android:id="@+id/gameStatsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#fee46a"
+                android:text="Game Stats"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/startGameButton" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
