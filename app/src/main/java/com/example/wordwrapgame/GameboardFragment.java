@@ -340,7 +340,7 @@ public class GameboardFragment extends Fragment {
     }
 
     private void resetGame() {
-        // TODO: Need to update sharedpreferences
+
         updateSharedPreferences();
 
         // reset all attributes to default and spawn a new game
@@ -362,7 +362,7 @@ public class GameboardFragment extends Fragment {
     }
 
     private void updateSharedPreferences() {
-        SharedPreferences prefs = requireActivity().getSharedPreferences("word_wrap_user_stats", Context.MODE_PRIVATE);
+        SharedPreferences prefs = requireActivity().getSharedPreferences("stats", Context.MODE_PRIVATE);
         // get
         float totalScore = prefs.getFloat("total_score", 0);
         int totalWordsFound = prefs.getInt("total_words_found", 0);
@@ -387,6 +387,7 @@ public class GameboardFragment extends Fragment {
         editor.putInt("total_games_completed", totalGamesCompleted);
         editor.putFloat("average_words_per_game", averageWordsPerGame);
         editor.apply();
+        editor.commit();
     }
 
     private GridLayout.LayoutParams getCardLayoutParams(int row, int col) {
