@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -31,6 +33,13 @@ import com.example.wordwrapgame.logic.Die;
 import java.util.ArrayList;
 
 public class GameboardFragment extends Fragment {
+
+    private static final String[][] testboard = {
+            {"a", "B", "C", "D"},
+            {"d", "e", "G", "H"},
+            {"u", "J", "K", "L"},
+            {"l", "N", "O", "P"}
+    };
     Boggle boggle;
     GridLayout gameboardLayout;
     FrameLayout overlay;
@@ -46,6 +55,10 @@ public class GameboardFragment extends Fragment {
     TextView scoreValue;
     TextView wordCountValue;
 
+    CardView showFoundWordsButton;
+    CardView showRemainingWordsButton;
+    ImageView returnToMenuButton;
+
 
     public GameboardFragment() {
         // Required empty public constructor
@@ -58,12 +71,6 @@ public class GameboardFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        String[][] testboard = {
-                {"a", "B", "C", "D"},
-                {"d", "e", "G", "H"},
-                {"u", "J", "K", "L"},
-                {"l", "N", "O", "P"}
-        };
 
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
@@ -88,6 +95,15 @@ public class GameboardFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_gameboard, container, false);
 
         // Initialize UI components
+        // return to menu
+        returnToMenuButton = view.findViewById(R.id.return_to_menu_button);
+        returnToMenuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requireActivity().onBackPressed();
+            }
+        });
+
         // Animation Overlay
         overlay = view.findViewById(R.id.overlay);
 
@@ -97,6 +113,29 @@ public class GameboardFragment extends Fragment {
         currentWordsFound = 0;
         currentScore = 0;
         updateCardAmounts();
+
+        // Buttons
+        showFoundWordsButton = view.findViewById(R.id.show_found_words_button);
+        showRemainingWordsButton = view.findViewById(R.id.show_remaining_words_button);
+
+        showFoundWordsButton.setClickable(true);
+        showRemainingWordsButton.setClickable(true);
+
+
+        showFoundWordsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("GameboardFragment", "showFoundWordsButton clicked");
+                WordDisplayBottomSheet bottomSheet = new WordDisplayBottomSheet(wordList, true);
+                bottomSheet.show(getParentFragmentManager(), "bottomSheet");
+            }
+        });
+        showRemainingWordsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showEndGameConfirmationDialog();
+            }
+        });
 
 
         // Game board
@@ -277,16 +316,77 @@ public class GameboardFragment extends Fragment {
         gameboardLayout.invalidate();
 
     }
+    private void showEndGameConfirmationDialog() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("End Game?")
+                .setMessage("Viewing the remaining words will end the current game. Are you sure?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // User confirmed, conclude the game
+                    concludeGame();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    // User canceled, dismiss the dialog
+                    dialog.dismiss();
+                })
+                .create()
+                .show();
+    }
+
+
+    private void concludeGame() {
+        WordDisplayBottomSheet bottomSheet = new WordDisplayBottomSheet(getRemainingWords(), false);
+        bottomSheet.show(getParentFragmentManager(), "bottomSheet");
+        resetGame();
+    }
 
     private void resetGame() {
-
-        // Add score to the score total
-
-        // Get score item
-
-
+        // TODO: Need to update sharedpreferences
+        updateSharedPreferences();
 
         // reset all attributes to default and spawn a new game
+        // Reset score and word list
+        currentWordsFound = 0;
+        currentScore = 0;
+        wordList.clear();
+        updateCardAmounts();
+
+        // Clear highlights and reset the board
+        resetHighlights();
+        gameboardLayout.removeAllViews();
+        boggle = new Boggle(requireContext());
+        boggle.solveBoard();
+        solvedWords = boggle.getWordsFound();
+        wordList = new ArrayList<>();
+        selectedPath = new ArrayList<>();
+        initGameboard();
+    }
+
+    private void updateSharedPreferences() {
+        SharedPreferences prefs = requireActivity().getSharedPreferences("word_wrap_user_stats", Context.MODE_PRIVATE);
+        // get
+        float totalScore = prefs.getFloat("total_score", 0);
+        int totalWordsFound = prefs.getInt("total_words_found", 0);
+        int totalGamesPlayed = prefs.getInt("total_games_played", 0);
+        int totalGamesCompleted = prefs.getInt("total_games_completed", 0);
+
+        // calculate
+        totalScore += currentScore;
+        totalWordsFound += currentWordsFound;
+        totalGamesPlayed++;
+
+        if (currentWordsFound == wordList.size())
+            totalGamesCompleted++;
+
+        float averageWordsPerGame = ((float) totalWordsFound)  / ((float) totalGamesPlayed);
+
+        // edit
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putFloat("total_score",  totalScore);
+        editor.putInt("total_words_found", totalWordsFound);
+        editor.putInt("total_games_played", totalGamesPlayed);
+        editor.putInt("total_games_completed", totalGamesCompleted);
+        editor.putFloat("average_words_per_game", averageWordsPerGame);
+        editor.apply();
     }
 
     private GridLayout.LayoutParams getCardLayoutParams(int row, int col) {
@@ -371,5 +471,15 @@ public class GameboardFragment extends Fragment {
 
         // Start the animation
         animatorSet.start();
+    }
+
+    private ArrayList<String> getRemainingWords() {
+        ArrayList<String> newList = new ArrayList<>();
+        for (String word : solvedWords) {
+            if (!wordList.contains(word)) {
+                newList.add(word);
+            }
+        }
+        return newList;
     }
 }
