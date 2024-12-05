@@ -15,7 +15,6 @@
         android:padding="10dp"
         app:cardCornerRadius="6dp"
         android:elevation="10dp"
-        android:background="#98b7fe"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
